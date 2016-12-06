@@ -1,0 +1,8 @@
+[package]
+name = "svg_graph"
+version = "0.1.0"
+authors = ["Roman Zaynetdinov <romanznet@gmail.com>"]
+
+[dependencies]
+maud = { git = "https://github.com/lfairy/maud", rev = "8d0e412" }
+maud_macros = { git = "https://github.com/lfairy/maud", rev = "8d0e412" }

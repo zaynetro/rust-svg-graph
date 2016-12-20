@@ -22,7 +22,7 @@ Project is in the very early stage.
 * [x] Reuse code for plotting X,Y axes
 * [ ] Write tests for common calculations
 * [ ] Separate graph stylings into separate module
-* [ ] Use scale as an interface
+* [x] Use scale as an interface
 * [ ] Verify edge cases work (zero entries, one entry, a lot of entries)
 * [ ] Handle negative values (?)
 * [ ] Improve codebase (remove hacks)

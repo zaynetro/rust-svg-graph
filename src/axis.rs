@@ -28,10 +28,10 @@ impl Axes2d {
                 height: height,
                 color: color.clone(),
                 alignment: alignment.clone(),
-                scale: LinearScale {
+                scale: Box::new(LinearScale {
                     n: y_n,
                     width: height + dy,
-                },
+                }),
             }
         };
 
@@ -48,10 +48,10 @@ impl Axes2d {
                 height: height,
                 color: color.clone(),
                 alignment: alignment.clone(),
-                scale: LinearScale {
+                scale: Box::new(LinearScale {
                     n: x_n,
                     width: width + dx,
-                },
+                }),
             }
         };
 
@@ -70,13 +70,13 @@ impl Axes2d {
         }
     }
 
-    pub fn labels(&self, scale: &LinearScale, entries: &Vec<Entry>) -> Vec<Label> {
+    pub fn labels(&self, entries: &Vec<Entry>) -> Vec<Label> {
         entries
             .iter()
             .enumerate()
             .map(|(i, e)| {
-                let w = scale.segment(i);
-                let x = scale.offset(i);
+                let w = self.x.scale.segment(i);
+                let x = self.x.scale.offset(i);
                 let label_x = match self.x.alignment {
                     Alignment::Middle => x + w / 2.0,
                     _ => x
@@ -130,7 +130,7 @@ impl Axes2d {
     }
 
     pub fn x_axis_html(&self, entries: &Vec<Entry>) -> HTML {
-        let labels = self.labels(&self.x.scale, entries);
+        let labels = self.labels(entries);
 
         html! {
             g.x-axis transform=(Tools::tr(self.x.x, self.x.y)) {
@@ -186,7 +186,7 @@ pub struct Axis {
     pub height: f32,
     pub color: String,
     pub alignment: Alignment,
-    pub scale: LinearScale,
+    pub scale: Box<Scale>,
 }
 
 impl Axis {

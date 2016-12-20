@@ -1,7 +1,6 @@
 use graph::{Graph, Tools, Coord, Padding, HTML, Size};
 use entry::Entry;
 use axis::{Axes2d, Alignment};
-use scale::Scale;
 
 pub struct Line {
     size: Size,

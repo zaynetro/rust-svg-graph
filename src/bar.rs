@@ -66,13 +66,20 @@ impl Bar {
                 let dx = box_w / 6.0;
                 let w = box_w - 2.0 * dx;
                 let h = self.axes.y.scale.offset(e.value as f32);
+                let zero = self.axes.y.scale.offset(0.0);
+                let bar_height = h - zero;
+                let y = if bar_height > 0.0 {
+                    self.axes.y.height - zero - bar_height
+                } else {
+                    self.axes.y.height - zero
+                };
 
                 BarColumn {
                     x: self.axes.x.scale.offset(i as f32),
-                    y: self.axes.y.height - h,
+                    y: y,
                     dx: dx,
                     width: w,
-                    height: h,
+                    height: bar_height.abs(),
                     fill: "rgba(131,43,189,0.6)".to_string()
                 }
             })

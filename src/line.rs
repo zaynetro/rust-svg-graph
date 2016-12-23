@@ -28,18 +28,12 @@ impl Line {
             let y_opt = {
                 let (min, max) = {
                     let (min, max) = Tools::min_max_entry_values(&entries);
-                    if min > 0 {
-                        (5, max)
-                    } else if max < 0 {
-                        (min, 0)
-                    } else {
-                        (min, max)
-                    }
+                    ((min as f32).min(0.0), (max as f32).max(0.0))
                 };
 
                 AxisOption {
                     scale: Box::new(
-                        LinearRoundedScale::new(min as f32, max as f32)
+                        LinearRoundedScale::new(min, max)
                     ),
                     label_position: LabelPosition::Normal,
                 }
@@ -60,7 +54,7 @@ impl Line {
     }
 
     fn line_path(&self) -> String {
-        let h = self.axes.y.height;
+        let h = self.body.height;
 
         self.entries
             .iter()
@@ -68,7 +62,7 @@ impl Line {
             .map(|(i, e)| (self.axes.x.scale.offset(i as f32),
                            h - self.axes.y.scale.offset(e.value as f32)))
             .fold("".to_string(), |acc, (x, y)| {
-                let op = if acc.len() == 0 {
+                let op = if acc.is_empty() {
                     "M"
                 } else {
                     "L"

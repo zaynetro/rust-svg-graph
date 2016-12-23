@@ -137,7 +137,45 @@ mod tests {
     use super::*;
 
     #[test]
-    fn bound_test() {
+    fn linear_scale() {
+        {
+            let scale = LinearScale::new(0.0, 10.0).with_range(0.0, 100.0);
+            assert_eq!(scale.segment(), 10.0);
+            assert_eq!(scale.offset(0.0), 0.0);
+            assert_eq!(scale.offset(5.0), 50.0);
+            assert_eq!(scale.ticks(), vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        }
+
+        {
+            let scale = LinearScale::new(-5.0, 5.0).with_range(0.0, 100.0);
+            assert_eq!(scale.segment(), 10.0);
+            assert_eq!(scale.offset(-5.0), 0.0);
+            assert_eq!(scale.offset(5.0), 100.0);
+            assert_eq!(scale.ticks(), vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        }
+    }
+
+    #[test]
+    fn linear_rounded_scale() {
+        {
+            let scale = LinearRoundedScale::new(0.0, 10.0).with_range(0.0, 100.0);
+            assert_eq!(scale.segment(), 5.0);
+            assert_eq!(scale.offset(0.0), 0.0);
+            assert_eq!(scale.offset(5.0), 33.333336);
+            assert_eq!(scale.ticks(), vec![0, 5, 10, 15]);
+        }
+
+        {
+            let scale = LinearRoundedScale::new(-5.0, 5.0).with_range(0.0, 100.0);
+            assert_eq!(scale.segment(), 5.0);
+            assert_eq!(scale.offset(-5.0), 25.0);
+            assert_eq!(scale.offset(5.0), 75.0);
+            assert_eq!(scale.ticks(), vec![-10, -5, 0, 5, 10]);
+        }
+    }
+
+    #[test]
+    fn bound() {
         assert_eq!(Bound::Begin.bound(0.0, 20.0), 0.0);
         assert_eq!(Bound::Begin.bound(-19.0, 20.0), -20.0);
         assert_eq!(Bound::Begin.bound(-21.0, 10.0), -30.0);
@@ -149,5 +187,8 @@ mod tests {
         assert_eq!(Bound::End.bound(-19.0, 20.0), 0.0);
         assert_eq!(Bound::End.bound(152.7, 5.0), 155.0);
         assert_eq!(Bound::End.bound(3.0, 2.0), 4.0);
+
+        assert_eq!(Bound::Begin.sign(), -1.0);
+        assert_eq!(Bound::End.sign(), 1.0);
     }
 }

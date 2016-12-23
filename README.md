@@ -29,6 +29,8 @@ Project is in the very early stage.
 * [ ] Default colour palette
 * [ ] Write docs
 * [ ] Combine LinearScale and LinearRoundedScale
+* [ ] Create basic svg nodes as separate structs with render method
+* [ ] Graph builder or graph configuration object
 
 
 ## Notes

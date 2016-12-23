@@ -28,11 +28,7 @@ impl Bar {
             let y_opt = {
                 let (min, max) = {
                     let (min, max) = Tools::min_max_entry_values(&entries);
-                    if min > 0 {
-                        (0, max)
-                    } else {
-                        (min, max)
-                    }
+                    ((min as f32).min(0.0), (max as f32).max(0.0))
                 };
 
                 AxisOption {

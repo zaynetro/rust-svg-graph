@@ -1,6 +1,6 @@
 extern crate svg_graph;
 
-use svg_graph::{Graph, Line, Entry};
+use svg_graph::{Graph, LineBuilder, Entry};
 
 #[test]
 fn line_graph_to_file() {
@@ -14,7 +14,11 @@ fn line_graph_to_file() {
         Entry::new("Seven", 77),
         Entry::new("Eight", 128)
     ];
-    let line = Line::new(entries);
+    let line = LineBuilder::new()
+                .width(500.0)
+                .height(500.0)
+                .entries(entries)
+                .build();
     match line.into_file("./images/line.svg") {
         Err(e) => {
             panic!("Couldn't save to file {}", e);

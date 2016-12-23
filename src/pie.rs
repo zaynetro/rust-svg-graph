@@ -1,21 +1,46 @@
-use std::f32;
+use std::f32::consts;
 
 use graph::{Graph, Tools, Coord, Padding, HTML, Size};
 use entry::Entry;
 
-pub struct Pie {
-    size: Size,
-    entries: Vec<Entry>,
-    labels_body: Coord,
-    body: Coord,
-    sum: i32,
+pub struct PieBuilder {
+    width: f32,
+    height: f32,
+    entries: Option<Vec<Entry>>,
 }
 
-impl Pie {
-    pub fn new(entries: Vec<Entry>) -> Pie {
+impl PieBuilder {
+    pub fn new() -> PieBuilder {
+        PieBuilder {
+            width: 500.0,
+            height: 500.0,
+            entries: None,
+        }
+    }
+
+    pub fn width(mut self, width: f32) -> PieBuilder {
+        self.width = width;
+        self
+    }
+
+    pub fn height(mut self, height: f32) -> PieBuilder {
+        self.height = height;
+        self
+    }
+
+    pub fn entries(mut self, entries: Vec<Entry>) -> PieBuilder {
+        self.entries = Some(entries);
+        self
+    }
+
+    pub fn build(self) -> Pie {
         let padding = Padding::with_same(15.0);
         let Padding { top, right, bottom, left } = padding;
-        let (width, height) = (500.0, 500.0);
+        let (width, height) = (self.width, self.height);
+        let entries = match self.entries {
+            Some(e) => e,
+            None    => Vec::with_capacity(0),
+        };
 
         let label_width = 100.0; // TODO: calculate dynamically
         let label_padding_left = 20.0;
@@ -44,9 +69,19 @@ impl Pie {
             entries: entries,
         }
     }
+}
 
+pub struct Pie {
+    size: Size,
+    entries: Vec<Entry>,
+    labels_body: Coord,
+    body: Coord,
+    sum: i32,
+}
+
+impl Pie {
     fn angle(&self, v: i32) -> f32 {
-        (v as f32) / (self.sum as f32) * 2.0 * f32::consts::PI
+        (v as f32) / (self.sum as f32) * 2.0 * consts::PI
     }
 
     fn color(i: usize) -> String {

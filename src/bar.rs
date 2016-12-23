@@ -3,19 +3,44 @@ use entry::Entry;
 use axis::{Axes2d, LabelPosition, AxisOption};
 use scale::{LinearScale, LinearRoundedScale};
 
-pub struct Bar {
-    size: Size,
-    entries: Vec<Entry>,
-    padding: Padding,
-    body: Coord,
-    axes: Axes2d,
+pub struct BarBuilder {
+    width: f32,
+    height: f32,
+    entries: Option<Vec<Entry>>,
 }
 
-impl Bar {
-    pub fn new(entries: Vec<Entry>) -> Bar {
+impl BarBuilder {
+    pub fn new() -> BarBuilder {
+        BarBuilder {
+            width: 500.0,
+            height: 500.0,
+            entries: None,
+        }
+    }
+
+    pub fn width(mut self, width: f32) -> BarBuilder {
+        self.width = width;
+        self
+    }
+
+    pub fn height(mut self, height: f32) -> BarBuilder {
+        self.height = height;
+        self
+    }
+
+    pub fn entries(mut self, entries: Vec<Entry>) -> BarBuilder {
+        self.entries = Some(entries);
+        self
+    }
+
+    pub fn build(self) -> Bar {
         let padding = Padding::with_same(15.0);
-        let (width, height) = (500.0, 500.0);
+        let (width, height) = (self.width, self.height);
         let content = Coord::from_padding(&padding, (0.0, 0.0, width, height));
+        let entries = match self.entries {
+            Some(e) => e,
+            None    => Vec::with_capacity(0),
+        };
 
         let axes = {
             let x_opt = AxisOption {
@@ -52,7 +77,17 @@ impl Bar {
             entries: entries,
         }
     }
+}
 
+pub struct Bar {
+    size: Size,
+    entries: Vec<Entry>,
+    padding: Padding,
+    body: Coord,
+    axes: Axes2d,
+}
+
+impl Bar {
     fn bars(&self) -> Vec<BarColumn> {
         self.entries
             .iter()

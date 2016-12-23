@@ -1,6 +1,6 @@
 extern crate svg_graph;
 
-use svg_graph::{Graph, Pie, Entry};
+use svg_graph::{Graph, PieBuilder, Entry};
 
 #[test]
 fn pie_graph_to_file() {
@@ -16,7 +16,7 @@ fn pie_graph_to_file() {
         Entry::new("Nine", 15),
         Entry::new("Ten", 15),
     ];
-    let pie = Pie::new(entries);
+    let pie = PieBuilder::new().entries(entries).build();
     match pie.into_file("./images/pie.svg") {
         Err(e) => {
             panic!("Couldn't save to file {}", e);

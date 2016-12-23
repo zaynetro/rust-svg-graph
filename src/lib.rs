@@ -15,9 +15,9 @@ mod axis;
 
 pub use graph::Graph;
 pub use entry::Entry;
-pub use bar::Bar;
-pub use line::Line;
-pub use pie::Pie;
+pub use bar::{BarBuilder, Bar};
+pub use line::{LineBuilder, Line};
+pub use pie::{PieBuilder, Pie};
 
 //#[cfg(test)]
 //mod tests {

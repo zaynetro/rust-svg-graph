@@ -1,6 +1,6 @@
 extern crate svg_graph;
 
-use svg_graph::{Graph, Bar, Entry};
+use svg_graph::{Graph, BarBuilder, Entry};
 
 #[test]
 fn bar_graph_to_file() {
@@ -10,7 +10,7 @@ fn bar_graph_to_file() {
         Entry::new("Three", 30),
         Entry::new("Four", 5)
     ];
-    let bar = Bar::new(entries);
+    let bar = BarBuilder::new().entries(entries).build();
     match bar.into_file("./images/bar.svg") {
         Err(e) => {
             panic!("Couldn't save to file {}", e);

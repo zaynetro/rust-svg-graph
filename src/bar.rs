@@ -1,6 +1,7 @@
 use graph::{Graph, Tools, Coord, Padding, HTML, Size};
 use entry::Entry;
-use axis::{Axes2d, Alignment};
+use axis::{Axes2d, LabelPosition, AxisOption};
+use scale::{LinearScale, LinearRoundedScale};
 
 pub struct Bar {
     size: Size,
@@ -12,21 +13,39 @@ pub struct Bar {
 
 impl Bar {
     pub fn new(entries: Vec<Entry>) -> Bar {
-        let padding = Padding::with_same(10.0);
-        let Padding { top, right, bottom, left } = padding;
+        let padding = Padding::with_same(15.0);
         let (width, height) = (500.0, 500.0);
-        let content = Coord {
-            x: left,
-            y: top,
-            width: width - left - right,
-            height: height - top - bottom,
+        let content = Coord::from_padding(&padding, (0.0, 0.0, width, height));
+
+        let axes = {
+            let x_opt = AxisOption {
+                scale: Box::new(
+                    LinearScale::new(0.0, entries.len() as f32)
+                ),
+                label_position: LabelPosition::InBetween,
+            };
+
+            let y_opt = {
+                let (min, max) = {
+                    let (min, max) = Tools::min_max_entry_values(&entries);
+                    if min > 0 {
+                        (0, max)
+                    } else {
+                        (min, max)
+                    }
+                };
+
+                AxisOption {
+                    scale: Box::new(
+                        LinearRoundedScale::new(min as f32, max as f32)
+                    ),
+                    label_position: LabelPosition::Normal,
+                }
+            };
+
+            Axes2d::new((content.width, content.height), x_opt, y_opt)
         };
-        let y_top = (1.1 * (Tools::max_entry_value(&entries) as f32)).floor();
-        let axes = Axes2d::new(content,
-            (entries.len(), y_top as usize),
-            (0.0, 0.0),
-            Alignment::Middle
-        );
+
         let body = axes.body();
 
         Bar {
@@ -43,13 +62,13 @@ impl Bar {
             .iter()
             .enumerate()
             .map(|(i, e)| {
-                let box_w = self.axes.x.scale.segment(i);
+                let box_w = self.axes.x.scale.segment();
                 let dx = box_w / 6.0;
                 let w = box_w - 2.0 * dx;
-                let h = self.axes.y.scale.offset(e.value as usize);
+                let h = self.axes.y.scale.offset(e.value as f32);
 
                 BarColumn {
-                    x: self.axes.x.scale.offset(i),
+                    x: self.axes.x.scale.offset(i as f32),
                     y: self.axes.y.height - h,
                     dx: dx,
                     width: w,
@@ -75,8 +94,7 @@ impl Graph for Bar {
                         }
                     }
 
-                    (self.axes.x_axis_html(&self.entries))
-                    (self.axes.y_axis_html())
+                    (self.axes.render(&self.entries))
                 }
             }
         }

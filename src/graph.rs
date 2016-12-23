@@ -1,6 +1,8 @@
 use std::io;
 use std::io::prelude::*;
 use std::fs::File;
+use std::i32::{MAX, MIN};
+
 use maud::PreEscaped;
 
 use entry::Entry;
@@ -30,6 +32,17 @@ pub struct Coord {
 }
 
 impl Coord {
+    pub fn from_padding(&Padding { top, right, bottom, left }: &Padding,
+                        (x, y, w, h): (f32, f32, f32, f32)) -> Coord {
+
+        Coord {
+            x: x + left,
+            y: y + top,
+            width: w - left - right,
+            height: h - top - bottom,
+        }
+    }
+
     pub fn center(&self) -> (f32, f32) {
         (self.width / 2.0 + self.x, self.height / 2.0 + self.y)
     }
@@ -69,10 +82,13 @@ impl Tools {
         format!("translate({},{})", x, y)
     }
 
-    pub fn max_entry_value(entries: &Vec<Entry>) -> i32 {
+    pub fn min_max_entry_values(entries: &Vec<Entry>) -> (i32, i32) {
         entries
             .iter()
-            .fold(0, |acc, ref e| if e.value > acc { e.value } else { acc })
+            .fold((MAX, MIN), |(min, max), ref e| {
+                let min = if e.value < min { e.value } else { min };
+                let max = if e.value > max { e.value } else { max };
+                (min, max)
+            })
     }
-
 }

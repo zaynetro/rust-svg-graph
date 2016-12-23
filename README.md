@@ -24,10 +24,11 @@ Project is in the very early stage.
 * [ ] Separate graph stylings into separate module
 * [x] Use scale as an interface
 * [ ] Verify edge cases work (zero entries, one entry, a lot of entries)
-* [ ] Handle negative values (?)
+* [x] Handle negative values (requires rewriting Axis)
 * [ ] Improve codebase (remove hacks)
 * [ ] Default colour palette
 * [ ] Write docs
+* [ ] Combine LinearScale and LinearRoundedScale
 
 
 ## Notes

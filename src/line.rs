@@ -1,6 +1,7 @@
 use graph::{Graph, Tools, Coord, Padding, HTML, Size};
 use entry::Entry;
-use axis::{Axes2d, Alignment};
+use axis::{Axes2d, LabelPosition, AxisOption};
+use scale::{LinearScale, LinearRoundedScale};
 
 pub struct Line {
     size: Size,
@@ -13,20 +14,40 @@ pub struct Line {
 impl Line {
     pub fn new(entries: Vec<Entry>) -> Line {
         let padding = Padding::with_same(15.0);
-        let Padding { top, right, bottom, left } = padding;
         let (width, height) = (500.0, 500.0);
-        let content = Coord {
-            x: left,
-            y: top,
-            width: width - left - right,
-            height: height - top - bottom,
+        let content = Coord::from_padding(&padding, (0.0, 0.0, width, height));
+
+        let axes = {
+            let x_opt = AxisOption {
+                scale: Box::new(
+                    LinearScale::new(0.0, entries.len() as f32)
+                ),
+                label_position: LabelPosition::Normal,
+            };
+
+            let y_opt = {
+                let (min, max) = {
+                    let (min, max) = Tools::min_max_entry_values(&entries);
+                    if min > 0 {
+                        (5, max)
+                    } else if max < 0 {
+                        (min, 0)
+                    } else {
+                        (min, max)
+                    }
+                };
+
+                AxisOption {
+                    scale: Box::new(
+                        LinearRoundedScale::new(min as f32, max as f32)
+                    ),
+                    label_position: LabelPosition::Normal,
+                }
+            };
+
+            Axes2d::new((content.width, content.height), x_opt, y_opt)
         };
-        let y_top = (1.1 * (Tools::max_entry_value(&entries) as f32)).floor();
-        let axes = Axes2d::new(content,
-            (entries.len() - 1, y_top as usize),
-            (-right, 0.0),
-            Alignment::UnderSeparator
-        );
+
         let body = axes.body();
 
         Line {
@@ -44,8 +65,8 @@ impl Line {
         self.entries
             .iter()
             .enumerate()
-            .map(|(i, e)| (self.axes.x.scale.offset(i),
-                           h - self.axes.y.scale.offset(e.value as usize)))
+            .map(|(i, e)| (self.axes.x.scale.offset(i as f32),
+                           h - self.axes.y.scale.offset(e.value as f32)))
             .fold("".to_string(), |acc, (x, y)| {
                 let op = if acc.len() == 0 {
                     "M"
@@ -65,8 +86,7 @@ impl Graph for Line {
             svg width=(self.size.width) height=(self.size.height) xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" {
 
                 g.content transform=(Tools::tr(self.padding.left, self.padding.top)) {
-                    (self.axes.y_axis_html())
-                    (self.axes.x_axis_html(&self.entries))
+                    (self.axes.render(&self.entries))
 
                     g.line-box transform=(Tools::tr(self.body.x, self.body.y)) {
                         path.line fill="none" stroke-width="2" stroke="rgb(1,120,111)" d=(line) {}
